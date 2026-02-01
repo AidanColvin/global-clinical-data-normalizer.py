@@ -30,8 +30,8 @@ def load_module(module_name, file_path):
 
 # Load the libraries
 print("Loading libraries...", end="")
-weight_lib = load_module("weight_normalizer", "weight-normalizer.py")
-height_lib = load_module("height_normalizer", "height-normalizer.py")
+weight_lib = load_module("weight-normalizer", "weight-normalizer.py")
+height_lib = load_module("height-normalizer", "height-normalizer.py")
 print(" Done.\n")
 
 # Aliases for easier usage
