@@ -2,18 +2,41 @@
 make-run.py: Clinical Data Normalizer CLI.
 
 A robust command-line interface that allows users to input raw clinical data
-and receive standardized outputs. It connects the weight and height logic
-into a single workflow.
+and receive standardized outputs.
 
-Usage:
-    python make-run.py
+NOTE: Uses importlib to handle filenames with hyphens (e.g., weight-normalizer.py).
 """
 
 import sys
-# NOTE: These imports rely on the library files named 'weight_normalizer.py' 
-# and 'height_normalizer.py'. Python does not allow hyphens in imports.
-from weight_normalizer import parse_weight_to_lbs
-from height_normalizer import parse_height_to_us, format_height
+import importlib.util
+
+# --- DYNAMIC IMPORTS FOR HYPHENATED FILES ---
+
+def load_module(module_name, file_path):
+    """Helper to import files with hyphens in their names."""
+    try:
+        spec = importlib.util.spec_from_file_location(module_name, file_path)
+        if spec is None:
+            raise ImportError(f"Could not find file: {file_path}")
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[module_name] = module
+        spec.loader.exec_module(module)
+        return module
+    except FileNotFoundError:
+        print(f"CRITICAL ERROR: Could not find '{file_path}'.")
+        print("Ensure you are in the correct directory.")
+        sys.exit(1)
+
+# Import 'weight-normalizer.py'
+weight_lib = load_module("weight_normalizer", "weight-normalizer.py")
+parse_weight_to_lbs = weight_lib.parse_weight_to_lbs
+
+# Import 'height-normalizer.py'
+height_lib = load_module("height_normalizer", "height-normalizer.py")
+parse_height_to_us = height_lib.parse_height_to_us
+format_height = height_lib.format_height
+
+# --------------------------------------------
 
 def clear_screen():
     print("\n" * 2)
